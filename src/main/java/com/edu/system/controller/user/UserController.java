@@ -12,25 +12,19 @@ import com.edu.system.security.RolesAllowed;
 import com.edu.system.service.user.UserService;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
-
 @RestController
 @RequestMapping("users")
 public class UserController {
 
     private final UserService userService;
-    private final HttpSession httpSession;
 
-    public UserController(UserService userService, HttpSession httpSession) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.httpSession = httpSession;
     }
 
     @PostMapping("login")
     public LoginResult login(@RequestBody LoginRequest requestBody) {
-        LoginResult result = userService.login(requestBody);
-        httpSession.setAttribute("user-login", result.getLogin());
-        return result;
+        return userService.login(requestBody);
     }
 
     @CheckCsrf
@@ -44,9 +38,7 @@ public class UserController {
     @PutMapping("register")
     @RolesAllowed({UserRole.STUDENT, UserRole.TEACHER})
     public LoginResult createPassword(@RequestBody CreatePasswordRequest requestBody) {
-        LoginResult result = userService.createPassword(requestBody);
-        httpSession.setAttribute("user-login", result.getLogin());
-        return result;
+        return userService.createPassword(requestBody);
     }
 
     @CheckCsrf
@@ -54,6 +46,5 @@ public class UserController {
     @RolesAllowed({UserRole.STUDENT, UserRole.TEACHER, UserRole.ADMIN})
     public void changePassword(@RequestBody ChangePasswordRequest requestBody) {
         userService.changePassword(requestBody);
-        httpSession.invalidate();
     }
 }

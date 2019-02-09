@@ -4,6 +4,4 @@ import com.edu.system.model.StudentGroup;
 import com.edu.system.service.GenericService;
 
 public interface StudentGroupService extends GenericService<StudentGroup> {
-
-    StudentGroup create(String name);
 }

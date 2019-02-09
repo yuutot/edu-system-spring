@@ -17,8 +17,11 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class AuthInterceptor extends HandlerInterceptorAdapter {
 
-    @Autowired
-    private UserSessionInfo userSessionInfo;
+    private final UserSessionInfo userSessionInfo;
+
+    public AuthInterceptor(UserSessionInfo userSessionInfo) {
+        this.userSessionInfo = userSessionInfo;
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {

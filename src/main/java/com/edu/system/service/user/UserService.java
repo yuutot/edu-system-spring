@@ -14,4 +14,5 @@ public interface UserService extends GenericService<User> {
     RegisterResponse register(RegisterRequest request);
     LoginResult createPassword(CreatePasswordRequest request);
     void changePassword(ChangePasswordRequest request);
+    User findByLogin(String login);
 }

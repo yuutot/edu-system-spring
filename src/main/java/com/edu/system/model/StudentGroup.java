@@ -15,4 +15,6 @@ public class StudentGroup extends AbstractEntity {
 
     @Column(unique = true)
     private String name;
+
+    private String faculty;
 }

@@ -31,4 +31,17 @@ public class StudentGroupController {
     public List<StudentGroup> getAll() {
         return studentGroupService.getAll();
     }
+
+    @DeleteMapping("{id}")
+    @RolesAllowed({UserRole.ADMIN})
+    public void delete(@PathVariable("id") Integer id) {
+        studentGroupService.deleteById(id);
+    }
+
+    @PutMapping
+    @RolesAllowed({UserRole.ADMIN})
+    @CheckCsrf
+    public StudentGroup update(@RequestBody StudentGroup studentGroup) {
+        return studentGroupService.update(studentGroup);
+    }
 }

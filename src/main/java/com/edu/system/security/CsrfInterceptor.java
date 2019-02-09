@@ -16,8 +16,11 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
 
     private static final String CSRF_TOKEN = "X-CSRF-TOKEN";
 
-    @Autowired
-    private UserSessionInfo userSessionInfo;
+    private final UserSessionInfo userSessionInfo;
+
+    public CsrfInterceptor(UserSessionInfo userSessionInfo) {
+        this.userSessionInfo = userSessionInfo;
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {

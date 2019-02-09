@@ -11,11 +11,4 @@ public class StudentGroupServiceImpl extends GenericServiceImpl<StudentGroup, St
     public StudentGroupServiceImpl(StudentGroupRepository dao) {
         super(dao);
     }
-
-    @Override
-    public StudentGroup create(String name) {
-        StudentGroup studentGroup = new StudentGroup();
-        studentGroup.setName(name);
-        return getDao().save(studentGroup);
-    }
 }

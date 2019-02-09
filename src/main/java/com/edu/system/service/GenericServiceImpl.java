@@ -29,6 +29,12 @@ public abstract class GenericServiceImpl<T extends AbstractEntity, R extends Bas
     }
 
     @Override
+    public T update(T entity) {
+        getById(entity.getId());
+        return save(entity);
+    }
+
+    @Override
     @Transactional
     public List<T> save(List<T> entities) {
         return dao.saveAll(entities);

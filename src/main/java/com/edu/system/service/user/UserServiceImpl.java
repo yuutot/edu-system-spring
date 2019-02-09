@@ -15,7 +15,10 @@ import com.edu.system.model.user.UserRole;
 import com.edu.system.model.user.UserSessionInfo;
 import com.edu.system.repository.UserRepository;
 import com.edu.system.service.GenericServiceImpl;
+import com.edu.system.service.StoringService;
+import com.edu.system.service.token.TokenService;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,11 +29,15 @@ public class UserServiceImpl extends GenericServiceImpl<User, UserRepository> im
 
     private final UserSessionInfo userSessionInfo;
     private final StudentService studentService;
+    private final StoringService<String, String> csrfStore;
+    private final TokenService tokenService;
 
-    public UserServiceImpl(UserRepository dao, UserSessionInfo userSessionInfo, StudentService studentService) {
+    public UserServiceImpl(UserRepository dao, UserSessionInfo userSessionInfo, StudentService studentService, StoringService<String, String> csrfStore, TokenService tokenService) {
         super(dao);
         this.userSessionInfo = userSessionInfo;
         this.studentService = studentService;
+        this.csrfStore = csrfStore;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -41,13 +48,11 @@ public class UserServiceImpl extends GenericServiceImpl<User, UserRepository> im
             throw new NotFoundException("Invalid login or password");
         }
 
-        System.out.println(userSessionInfo.getLogin());
-
         String csrf = UUID.randomUUID().toString();
 
-        fillUserSession(user, csrf);
+        csrfStore.save(user.getLogin(), csrf);
 
-        return new LoginResult(user.getLogin(), csrf, user.getUserRole());
+        return new LoginResult(user.getLogin(), csrf, tokenService.createToken(user), user.getUserRole());
     }
 
     @Override
@@ -93,9 +98,9 @@ public class UserServiceImpl extends GenericServiceImpl<User, UserRepository> im
 
         String csrf = UUID.randomUUID().toString();
 
-        fillUserSession(user, csrf);
+        csrfStore.save(user.getLogin(), csrf);
 
-        return new LoginResult(user.getLogin(), csrf, user.getUserRole());
+        return new LoginResult(user.getLogin(), csrf, tokenService.createToken(user), user.getUserRole());
     }
 
     @Override
@@ -109,13 +114,11 @@ public class UserServiceImpl extends GenericServiceImpl<User, UserRepository> im
 
         user.setPassword(DigestUtils.md5Hex(request.getPassword()));
         getDao().save(user);
-        userSessionInfo.invalidate();
     }
 
-    private void fillUserSession(User user, String csrf) {
-        userSessionInfo.setLogin(user.getLogin());
-        userSessionInfo.setPassword(user.getPassword());
-        userSessionInfo.setRole(user.getUserRole());
-        userSessionInfo.setCsrf(csrf);
+    @Override
+    @Cacheable("users")
+    public User findByLogin(String login) {
+        return getDao().findByLogin(login).orElseThrow(()-> new NotFoundException("User not found"));
     }
 }

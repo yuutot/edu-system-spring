@@ -9,6 +9,8 @@ public interface GenericService<T extends AbstractEntity> {
 
     T save(T entity);
 
+    T update(T entity);
+
     List<T> save(List<T> entities);
 
     void delete(T entity);
